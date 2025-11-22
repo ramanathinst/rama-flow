@@ -147,7 +147,7 @@ export function LoginForm() {
                     />
 
                     {/* Submit */}
-                    <Button disabled={isPending} type="submit" className="w-full">
+                    <Button disabled={isPending} type="submit" className="w-full bg-primary">
                         {isPending ? <XCircleIcon  className="size-4 animate-spin"/> : "Login"}
                     </Button>
 

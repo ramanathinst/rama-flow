@@ -20,9 +20,9 @@ export default async function Home() {
     </pre>
   </div>
 
-  <button className="mt-6 text-white px-4 py-2 rounded">
+  <div className="mt-6 text-white px-4 py-2 rounded">
     <LogoutButton />
-  </button>
+  </div>
 </div>
 
   )
