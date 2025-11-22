@@ -18,7 +18,7 @@ export const LogoutButton = () => {
                         toast.error(ctx.error.message)
                     }
                 }
-            })} variant={"secondary"}>
+            })} variant={"outline"} className="bg-primary text-white">
                 Logout
             </Button>
         </div>
