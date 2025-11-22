@@ -21,9 +21,11 @@ import { PlusIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 const loginSchema = z.object({
-    email: z.string().email("Invalid email"),
+    email: z.email("Invalid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -72,10 +74,11 @@ export function LoginForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen w-full">
-            <div className="">
-
-            <h1 className="text-2xl font-semibold text-center mb-5">Login</h1>
+        <div className="p-4 rounded border-none">
+            <Card className="p-4 bg-accent">
+                <CardHeader className="flex items-center flex-col w-full0">
+                    <CardTitle> Login to continue</CardTitle>
+                </CardHeader>
 
             {/* SOCIAL LOGIN */}
             <div className="space-y-3 mb-5">
@@ -84,7 +87,7 @@ export function LoginForm() {
                     className="w-full gap-2"
                     onClick={() => onSocialLogin("google")}
                 >
-                    <GlobeIcon className="w-5 h-5" />
+                    <Image src={"/logos/google.svg"} width={20} height={40} alt="Google" />
                     Continue with Google
                 </Button>
 
@@ -93,7 +96,7 @@ export function LoginForm() {
                     className="w-full gap-2"
                     onClick={() => onSocialLogin("github")}
                 >
-                    <PlusIcon className="w-5 h-5" />
+                    <Image src={"/logos/github.svg"} width={25} height={40} alt="Google" />
                     Continue with GitHub
                 </Button>
             </div>
@@ -157,7 +160,7 @@ export function LoginForm() {
                     </p>
                 </form>
             </Form>
+            </Card>
         </div>
-    </div>
     );
 }
