@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { polar, checkout, portal, usage, webhooks } from "@polar-sh/better-auth";
 import prisma from "./db";
+import { polarClient } from "./polar";
 
 
 export const auth = betterAuth({
@@ -10,5 +12,25 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         autoSignIn: true
-    }
+    },
+    plugins: [
+        polar({
+            client: polarClient,
+            createCustomerOnSignUp: true,
+            use: [
+                checkout({
+                    products: [
+                        {
+                            productId: "3b42aedb-b54e-4e2a-8bd1-7fe82700b18a",
+                            slug: "Pro" // Custom slug for easy reference in Checkout URL, e.g. /checkout/Nodebase-Pro
+                        }
+                    ],
+                    successUrl: process.env.POLAR_SUCCESS_URL,
+                    authenticatedUsersOnly: true
+                }),
+                portal(),
+                usage()
+            ],
+        })
+    ],
 });
