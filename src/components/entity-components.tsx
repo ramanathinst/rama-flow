@@ -1,6 +1,7 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Input } from "./ui/input";
 
 type EntityContainerProps = {
     children: React.ReactNode;
@@ -15,17 +16,20 @@ export const EntityContainer = ({
     search,
     pagination
 }: EntityContainerProps) => {
-    return(
-        <div className="gap-6 md:px-6 md:py-6">
-            {header}
-            <div className="flex flex-col gap-5">
-                {search}
-                {children}
-            </div>
+    return (
+    <div className="flex min-h-[680px] flex-col md:px-6 md:py-6">
+    {header}
 
-            {pagination}
-        </div>
-    )
+    <div className="flex flex-1 flex-col gap-5">
+        {search}
+        {children}
+    </div>
+
+    <div className="mt-auto pt-4">
+        {pagination}
+    </div>
+    </div>
+);
 }   
 
 type EntityHeaderProps = {
@@ -75,4 +79,85 @@ export const EntityHeader = ({
             )}
         </div>
     )
+}
+
+interface EntitySearchProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string
+}
+
+export const EntitySearch = ({
+    value,
+    onChange,
+    placeholder = "Search Workflows"
+} : EntitySearchProps) => {
+    return(
+        <div className="ml-auto relative gap-4 p-4">
+            <SearchIcon size={15} className="top-1/2 flex items-center ml-2 -translate-y-1/2 absolute" />
+            <Input 
+                className="px-7 w-[200px] border-border shadow-none bg-background"
+                placeholder={placeholder} 
+                value={value} 
+                onChange={(e) => onChange(e.target.value)} 
+            />
+        </div>
+    )
+}
+
+type EntityPaginationProps = {
+    page: number;          // current page (0-based)
+    totalPages: number;     // total pages
+    disabled?: boolean;    // optional global disabled (e.g. while loading)
+    onPageChange: (page: number) => void;
+};
+
+export function EntityPagination({ 
+    page,
+    totalPages,
+    disabled,
+    onPageChange
+}: EntityPaginationProps) {
+    const isPrevDisabled = page === 1 || disabled;
+    const isNextDisabled = page >= totalPages - 0 || disabled;
+
+    const handlePrev = () => {
+        if (isPrevDisabled) return;
+        onPageChange(page - 1);
+    };
+
+    const handleNext = () => {
+        if (isNextDisabled) return;
+        onPageChange(page + 1);
+    };
+
+    return (
+        <div className="flex items-center justify-between gap-2  text-orange-600">
+            <div className="flex-1 gap-4">
+                <span className="text-sm text-muted-foreground">
+                    Page <span className="font-medium">{page}</span> of{" "}
+                    <span className="font-medium">{totalPages}</span>
+                </span>
+            </div>
+
+        <div className="flex gap-3">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrev}
+                disabled={isPrevDisabled}
+            >
+                Prev
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={isNextDisabled}
+            >
+                Next
+            </Button>
+        </div>
+    </div>
+    );
 }
