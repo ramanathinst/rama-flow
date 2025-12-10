@@ -1,7 +1,11 @@
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { AlertTriangleIcon, Loader2Icon, MoreVerticalIcon, PackageOpenIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Input } from "./ui/input";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "./ui/empty";
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type EntityContainerProps = {
     children: React.ReactNode;
@@ -20,7 +24,7 @@ export const EntityContainer = ({
     <div className="flex min-h-[680px] flex-col md:px-6 md:py-6">
     {header}
 
-    <div className="flex flex-1 flex-col gap-5">
+    <div className="flex w-full flex-col gap-5">
         {search}
         {children}
     </div>
@@ -160,4 +164,174 @@ export function EntityPagination({
         </div>
     </div>
     );
+}
+
+interface StateViewProps {
+    message?: string;
+}
+
+export const LoadingView = ({ message} : StateViewProps ) => {
+    return(
+        <div className="flex flex-col justify-center items-center gap-2">
+            <Loader2Icon size={30} className="text-orange-600 animate-spin" />
+            <span> {message} </span>
+        </div>
+    )
+}
+
+export const ErrorView = ({ message} : StateViewProps ) => {
+    return(
+        <div className="flex flex-col justify-center items-center">
+            <AlertTriangleIcon size={30} className="text-orange-600" />
+            <span> {message} </span>
+        </div>
+    )
+}
+
+interface EmptyViewProps extends StateViewProps {
+    onNew?: () => void;
+    disabled?: boolean;
+}
+
+export const EmptyView = ({ 
+    onNew,
+    message,
+    disabled
+}: EmptyViewProps) => {
+    return (
+        <Empty>
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <PackageOpenIcon />
+                </EmptyMedia>
+                <EmptyTitle>No Items Yet</EmptyTitle>
+                {!!message && (
+                    <EmptyDescription>
+                        {message}
+                    </EmptyDescription>
+                )}
+            </EmptyHeader>
+            {!!onNew && (
+                <EmptyContent>
+                <div className="flex gap-2">
+                    <Button disabled={disabled} onClick={onNew}>Create Workflow</Button>
+                </div>
+            </EmptyContent>
+            )}
+        </Empty>
+    )
+}
+
+interface EntityListsProps<T>{
+    items: T[];
+    renderItem: (item: T, index: number) => React.ReactNode;
+    getKey?: (item: T, index: number) => string | number;
+    emptyView?: React.ReactNode;
+    className?: string;
+}
+
+export function EntityLists<T>({
+    items,
+    renderItem,
+    getKey,
+    emptyView,
+    className
+}: EntityListsProps<T>){
+    if(items.length === 0 && emptyView ) {
+        return(
+            <div className="flex flex-col items-center justify-center bg-background max-w-sm m-auto border-border">
+                <div className="flex max-w-sm m-auto">
+                    {emptyView}
+                </div>
+            </div>
+        )
+    }
+
+    return(
+        <div className={cn("flex flex-col w-full gap-4", className)}>
+            {items.map((item, index) => (
+                <div key={getKey ? getKey(item, index) : index}>
+                    {renderItem(item, index)}
+                </div>
+            ))}
+        </div>
+    )
+}   
+
+interface EntityItemProps {
+    href: string;
+    title: string;
+    subTitle?: React.ReactNode;
+    image?: React.ReactNode;
+    actions?: React.ReactNode;
+    onRemove?: () => void | Promise<void>;
+    isRemoving?: boolean;
+    className?: string;
+}
+
+export const EntityItem = ({
+    href,
+    title,
+    subTitle,
+    image,
+    actions,
+    onRemove,
+    isRemoving,
+    className
+} : EntityItemProps) => {
+    const handleRemove = async(e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if(isRemoving) {
+            return;
+        }
+
+        if(onRemove) {
+            await onRemove();
+        }
+    }
+    return(
+        <Link href={href} prefetch>
+            <Card className={cn("p-4 shadow-none hover:shadow cursor-pointer", isRemoving && "opacity-50 cursor-not-allowed", className)}>
+                <CardContent className=" flex flex-row w-full items-center justify-between">
+                        <div className="flex flex-col">
+                                {image}
+                        </div>
+                    <CardHeader className="w-full">
+                        <CardTitle> {title} </CardTitle>
+                        {!!subTitle && (
+                            <CardDescription className="text-muted-foreground font-light text-sm ">
+                                {subTitle}
+                            </CardDescription>
+                        )}
+                    </CardHeader>
+
+                {(actions || onRemove) && (
+                    <div className="">
+                        {actions}
+
+                        {onRemove && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <Button>
+                                        <MoreVerticalIcon size={25} />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={(e) => e.stopPropagation() } >
+                                        <Button onClick={handleRemove}>
+                                            <TrashIcon size={25} />
+                                            <span> Delete </span>
+                                        </Button>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+                    </div>
+                )}
+            </CardContent>
+            </Card>
+        </Link>
+    )
 }
