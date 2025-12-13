@@ -110,7 +110,7 @@ export const EditorBreadcrums = ({workflowId}: {workflowId: string}) => {
 
 export const EditorHeader = ({workflowId}: {workflowId: string}) => {
     return(
-        <header className="flex justify-between mb-6 border-b-2 items-center px-6 py-5">
+        <header className="flex justify-between border-b-2 items-center px-6 py-5">
             <div className="flex items-center justify-center gap-5">
                 <SidebarTrigger size={"icon"} />
                 <EditorBreadcrums  workflowId={workflowId} />
