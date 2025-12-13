@@ -1,43 +1,40 @@
-"use client"
-
 import { NodeToolbar, Position } from "@xyflow/react";
-import type { ReactNode } from "react"
+import { memo } from "react";
 import { Button } from "./ui/button";
 import { SettingsIcon, TrashIcon } from "lucide-react";
 
-interface WorkflowNodeProps {
-    children: ReactNode;
+type WorkflowNodeProps = {
+    children: React.ReactNode;
     showToolbar?: boolean;
-    onDelete?: () => void;
-    onSetting?: () => void;
     name?: string;
-    description?: string
+    description?: string;
+    onSetting?: () => void;
+    onDelete?: () => void;
 }
 
-export function WorkflowNode({
+export const WorkflowNode = memo(({
     children,
     showToolbar = true,
-    onDelete,
-    onSetting,
     name,
-    description
-}: WorkflowNodeProps){
-    return (
+    description,
+    onSetting,
+    onDelete
+}: WorkflowNodeProps) => {
+    return(
         <>
             {showToolbar && (
-                <NodeToolbar>
-                    <div className="flex flex-row gap-4">
-                        <Button onClick={onSetting} size="sm" variant="ghost">
-                            <SettingsIcon className="size-4" />
-                        </Button>
-
-                        <Button onClick={onDelete} size="sm" variant="ghost">
-                            <TrashIcon className="size-4" />
-                        </Button>   
-                    </div>
+                <NodeToolbar position={Position.Top}>
+                    <Button onClick={onSetting} variant={"ghost"}>
+                        <SettingsIcon className="size-4" />
+                    </Button>
+                    <Button onClick={onDelete} variant={"ghost"}>
+                        <TrashIcon className="size-4" />
+                    </Button>
                 </NodeToolbar>
             )}
+
             {children}
+            
             {name && (
                 <NodeToolbar
                     position={Position.Bottom}
@@ -52,4 +49,4 @@ export function WorkflowNode({
             )}            
         </>
     )
-}
+})
