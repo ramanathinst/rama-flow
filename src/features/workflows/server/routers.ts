@@ -6,7 +6,6 @@ import type { Node, Edge } from "@xyflow/react";
 import { id } from "date-fns/locale";
 import { generateSlug } from "random-word-slugs"
 import z from "zod";
-import type { Node, Edge } from "@xyflow/react"
 
 export const workflowsRouter = createTRPCRouter({
     create: premiumProcedure.mutation(({ctx}) => {
