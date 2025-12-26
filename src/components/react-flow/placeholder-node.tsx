@@ -22,7 +22,7 @@ export const PlaceholderNode = forwardRef<HTMLDivElement, PlaceholderNodeProps>(
         <BaseNode
             ref={ref}
             onClick={onClick}
-            className="bg-card w-[150px] border-dashed border-gray-400 p-2 text-center text-gray-400 shadow-none"
+            className="bg-card w-[50px]  h-[35px] border-dashed border-gray-400 p-2 text-center text-gray-400 shadow-none"
         >
             {children}
             <Handle
