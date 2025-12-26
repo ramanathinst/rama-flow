@@ -86,6 +86,8 @@ model Workflow {
 }
 enum NodeType {
   INITIAL
+  MANULA_TRIGGER
+  HTTP_REQUEST
 }
 
 model Node {
