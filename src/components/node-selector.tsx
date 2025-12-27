@@ -26,7 +26,7 @@ const triggersNode: NodeTypeOptions[] = [{
     icon: MousePointerIcon,
     label: "Manual Trigger",
     description: "Run the flow a clicking on button. Good for getting starts quickly",
-    type: NodeType.MANULA_TRIGGER,
+    type: NodeType.MANUAL_TRIGGER,
 }]
 
 const executionsNode: NodeTypeOptions[] = [{
@@ -50,9 +50,9 @@ export const NodeSelector = memo(({
 }: NodeSelectorProps) => {
     const { getNodes, setNodes, screenToFlowPosition } = useReactFlow();
     const handleSelector = useCallback((selection: NodeTypeOptions) => {
-            if(selection.type === NodeType.MANULA_TRIGGER) {
+            if(selection.type === NodeType.MANUAL_TRIGGER) {
                 const nodes = getNodes();
-                const hasManualTrigger = nodes.some( node => node.type === NodeType.MANULA_TRIGGER);
+                const hasManualTrigger = nodes.some( node => node.type === NodeType.MANUAL_TRIGGER);
                 if(hasManualTrigger) {
                     toast.error("Only one workflow is allowed per workflow!");
                     return;
