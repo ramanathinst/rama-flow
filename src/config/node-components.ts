@@ -6,7 +6,7 @@ import { NodeTypes } from "@xyflow/react";
 
 export const nodeComponents = {
     [NodeType.INITIAL] : InitialNode,
-    [NodeType.MANULA_TRIGGER] : ManualTriggersNode,
+    [NodeType.MANUAL_TRIGGER] : ManualTriggersNode,
     [NodeType.HTTP_REQUEST] : HttpRequestsNode,
 } as const satisfies NodeTypes;
 

@@ -4,10 +4,12 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useSuspenseWorkflow, useUpdateNameWorkflow } from "@/features/workflows/hooks/use-workflows"
+import { useSuspenseWorkflow, useUpdateNameWorkflow, useUpdateWorkflow } from "@/features/workflows/hooks/use-workflows"
+import { useAtomValue } from "jotai"
 import { SaveIcon } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { editorAtoms } from "../store/atoms"
 
 export const EditorNameInput = ({workflowId}: {workflowId: string}) => {
 
@@ -78,10 +80,25 @@ export const EditorNameInput = ({workflowId}: {workflowId: string}) => {
     )
 }
 
-export const EditorSaveButton = () => {
+export const EditorSaveButton = ({workflowId}: {workflowId: string}) => {
+    const saveWorkflow =  useUpdateWorkflow();
+    const editor = useAtomValue(editorAtoms);
+    const handleSave = () => {
+        if(!editor) {
+            return
+        }
+        const nodes = editor.getNodes();
+        const edges = editor.getEdges();
+
+        saveWorkflow.mutate({
+            id: workflowId,
+            nodes,
+            edges
+        })
+    }
     return(
         <div>
-            <Button>
+            <Button onClick={handleSave} disabled={saveWorkflow.isPending}>
                 <SaveIcon size={25} />
                 Save
             </Button>
@@ -115,7 +132,7 @@ export const EditorHeader = ({workflowId}: {workflowId: string}) => {
                 <SidebarTrigger size={"icon"} />
                 <EditorBreadcrums  workflowId={workflowId} />
             </div>
-                <EditorSaveButton />
+                <EditorSaveButton  workflowId={workflowId} />
         </header>
     )
 }

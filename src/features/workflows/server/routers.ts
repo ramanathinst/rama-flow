@@ -33,6 +33,75 @@ export const workflowsRouter = createTRPCRouter({
         })
     }),
 
+    update: protectedProcedure.input(z.object({
+        id: z.string(),
+        nodes: z.array(
+            z.object({
+                id: z.string(),
+                type: z.string().nullish(),
+                position: z.object({
+                    x: z.number().nullish(),
+                    y: z.number().nullish(),
+                }),
+                data: z.record( z.string(), z.any()).optional()
+            })
+        ),
+        edges: z.array(
+            z.object({
+                source: z.string(),
+                target: z.string(),
+                sourceHandle: z.string().nullish(),
+                targetHandle: z.string().nullish()
+            })
+        )
+    })).mutation(async({ ctx, input }) => {
+        const { id, nodes, edges } = input;
+        const workflow = await prisma.workflow.findUniqueOrThrow({
+            where: {
+                id, 
+                userId: ctx.auth.user.id
+            }
+        })
+
+        // Transform ensure to consistancy
+        return await prisma.$transaction(async(tx) => {
+            // Delete existing nodes and connections
+            await tx.node.deleteMany({
+                where: {
+                    workflowId: id
+                }
+            })
+
+            await tx.node.createMany({
+                data: nodes.map((node) => ({
+                    id: node.id,
+                    workflowId: id,
+                    name: node.type || "unknown",
+                    position: node.position,
+                    type: node.type as NodeType,
+                    data: node.data || {}
+                }))
+            })
+
+            await tx.connection.createMany({
+                data: edges.map((edge) => ({
+                    workflowId: id,
+                    fromNodeId: edge.source,
+                    toNodeId: edge.target,
+                    fromOutput: edge.sourceHandle || "main",
+                    toInput: edge.targetHandle || "main",
+                }))
+            })
+            await tx.workflow.update({
+                    where: { id} ,
+                    data: {
+                        updatedAt: new Date(),
+                    }
+            })
+            return workflow;
+        })
+    }),
+
     updateName: protectedProcedure.input(z.object({id: z.string(), name: z.string()})).mutation(({ctx, input}) => {
         return prisma.workflow.update({
             where: {
@@ -115,7 +184,7 @@ export const workflowsRouter = createTRPCRouter({
             }),
         ]);
         
-        const totalPage = Math.ceil(totalCount / pageSize);
+        const totalPages = Math.ceil(totalCount / pageSize);
         const hasNextPage = page < pageSize;
         const hasPreviousPage = page > 1;
 
@@ -123,7 +192,7 @@ export const workflowsRouter = createTRPCRouter({
             items,
             page,
             pageSize,
-            totalPage,
+            totalPages,
             hasNextPage,
             hasPreviousPage
         };
